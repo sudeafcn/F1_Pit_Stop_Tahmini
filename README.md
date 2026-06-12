@@ -1,4 +1,4 @@
-# 🏎️ F1 Pit-Stop Stratejisi Tahmin Motoru  🏁
+# 🏎️ F1 Pit-Stop Stratejisi Tahmin Motoru (CRISP-DM) 🏁
 
 <div align="center">
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
@@ -38,20 +38,51 @@ Modelin yanlış kararlarının operasyonel maliyeti (Cost of Error) çok yükse
 
 Model, kesin 0-1 kararları vermek yerine **XGBoost** algoritması ile pite girme ihtimallerini olasılıksal olarak hesaplar (`predict_proba`). Bu sayede takımın risk iştahına göre dinamik eşik değerleri (threshold) belirlenebilir. Değerlendirme metriği olarak **ROC-AUC** skoru odak noktasına alınmıştır.
 
-## 📈 Veri Görselleştirme (EDA)
-Proje içerisinde **Plotly** kullanılarak yarış verileri üzerinde interaktif analizler yapılmıştır:
-- Lastik ömrüne göre pit ihtimali trendleri.
-- Yarış ilerlemesine (Race Progress) göre karar dağılımları.
-- Lastik hamuru bazında aşınma ve pite girme oranları.
+## 🧩 Model Çalışma Adımları
 
-## 🚀 Kurulum ve Kullanım
+### 2. Adım: Pipeline Entegrasyonu ve Veri Dönüşümü (Transform)
+Test veri seti, eğitim aşamasında kurgulanan ve optimize edilen `preprocessor` (Pipeline) mimarisinden geçirilir. Bu aşamada veri sızıntısını (**Data Leakage**) kesinlikle önlemek amacıyla yeniden `fit` işlemi yapılmaz; modelin eğitim setinden öğrendiği parametreler temel alınarak sadece `transform` fonksiyonu uygulanır.
 
+```python
+# Veri sızıntısını önlemek için sadece TRANSFORM kullanılıyor
+X_kaggle_test_processed = preprocessor.transform(test_df) 
+```
+ 3. Adım: Şampiyon XGBoost Modeli ile Olasılık Tahminleri
+Ön işlemesi tamamlanan test verileri, projenin en yüksek doğruluk oranına sahip şampiyon algoritması olan XGBoost (eXtreme Gradient Boosting) modeline beslenir. Model, katı bir 0 veya 1 sınıflandırması yerine predict_proba()[:, 1] fonksiyonu aracılığıyla pilotun pite girme olasılığını (%) hesaplar. Bu olasılık tabanlı yaklaşım, pit duvarındaki strateji mühendislerine risk toleranslarına göre esnek bir karar eşiği (Threshold) belirleme imkanı tanır.
+
+📈 Veri Görselleştirme (EDA)
+Proje içerisinde Plotly kullanılarak yarış verileri üzerinde interaktif analizler yapılmıştır:
+
+Lastik ömrüne göre pit ihtimali trendleri.
+
+Yarış ilerlemesine (Race Progress) göre karar dağılımları.
+
+Lastik hamuru bazında aşınma ve pite girme oranları.
+
+🚀 Kurulum ve Kullanım
 Projeyi yerel bilgisayarınızda incelemek ve çalıştırmak için:
 
 1. Bu depoyu klonlayın:
-```bash
+
+``` 
 git clone [https://github.com/sudeafcn/F1_Pit_Stop_Tahmini](https://github.com/sudeafcn/F1_Pit_Stop_Tahmini)
- cd f1-pitstop-prediction
+cd f1-pitstop-prediction
+```
+
+2. Gerekli kütüphaneleri yükleyin:
+
+``` 
 pip install pandas numpy scikit-learn xgboost plotly jupyter
+```
+
+3. Notebook dosyasını açın:
+
+```
 jupyter notebook F1_PitStop_CRISP_DM.ipynb
+```
+
+ 
+
+
+
 
